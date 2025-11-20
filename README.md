@@ -1,5 +1,19 @@
 # PaperQA2
 
+## To run on our infrastructure
+
+There is a basic `azure.json` configuration file in `src/paperqa/configs` that provides a simple configuration `paperqa`'s `Settings` object.
+
+For it to work, it requires a `.env` file in the project root directory populated with the following variables:
+
+- `AZURE_API_BASE`
+- `AZURE_API_KEY`
+- `SEMANTIC_SCHOLAR_API_KEY`
+- `CROSSREF_MAILTO`
+- `OPENALEX_API_KEY`
+- `OPENALEX_MAILTO`
+
+To make use of the configuration, simply create a `Settings` object using its `from_name` class method, passing the stem of the json config as a string, i.e. `Settings.from_name("azure")`.
 <!-- pyml disable-num-lines 6 line-length -->
 
 [![GitHub](https://img.shields.io/badge/GitHub-black?logo=github&logoColor=white)](https://github.com/Future-House/paper-qa)

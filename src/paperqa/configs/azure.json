@@ -1,0 +1,95 @@
+{
+  "llm": "gpt-4.1-mini",
+  "llm_config": {
+    "model_list": [
+      {
+        "model_name": "gpt-4.1-mini",
+        "litellm_params": {
+          "model": "azure/gpt-4.1-mini",
+          "base_model": "gpt-4o-mini",
+          "api_base": "https://eppireasoning.openai.azure.com/"
+        }
+      },
+      {
+        "model_name": "text-embedding-3-small",
+        "litellm_params": {
+          "model": "azure/text-embedding-3-small",
+          "base_model": "text-embedding-3-small",
+          "api_base": "https://eppireasoning.openai.azure.com/"
+        }
+      }
+    ]
+  },
+  "summary_llm": "gpt-4.1-mini",
+  "summary_llm_config": {
+    "model_list": [
+      {
+        "model_name": "gpt-4.1-mini",
+        "litellm_params": {
+          "model": "azure/gpt-4.1-mini",
+          "base_model": "gpt-4o-mini",
+          "api_base": "https://eppireasoning.openai.azure.com/"
+        }
+      },
+      {
+        "model_name": "text-embedding-3-small",
+        "litellm_params": {
+          "model": "azure/text-embedding-3-small",
+          "base_model": "text-embedding-3-small",
+          "api_base": "https://eppireasoning.openai.azure.com/"
+        }
+      }
+    ]
+  },
+  "embedding": "text-embedding-3-small",
+  "embedding_config": {
+    "model_list": [
+      {
+        "model_name": "gpt-4.1-mini",
+        "litellm_params": {
+          "model": "azure/gpt-4.1-mini",
+          "base_model": "gpt-4o-mini",
+          "api_base": "https://eppireasoning.openai.azure.com/"
+        }
+      },
+      {
+        "model_name": "text-embedding-3-small",
+        "litellm_params": {
+          "model": "azure/text-embedding-3-small",
+          "base_model": "text-embedding-3-small",
+          "api_base": "https://eppireasoning.openai.azure.com/"
+        }
+      }
+    ]
+  },
+  "parsing": {
+    "multimodal": false
+  },
+  "agent": {
+    "agent_llm": "gpt-4.1-mini",
+    "agent_llm_config": {
+      "model_list": [
+        {
+          "model_name": "gpt-4.1-mini",
+          "litellm_params": {
+            "model": "azure/gpt-4.1-mini",
+            "base_model": "gpt-4o-mini",
+            "api_base": "https://eppireasoning.openai.azure.com/"
+          }
+        },
+        {
+          "model_name": "text-embedding-3-small",
+          "litellm_params": {
+            "model": "azure/text-embedding-3-small",
+            "base_model": "text-embedding-3-small",
+            "api_base": "https://eppireasoning.openai.azure.com/"
+          }
+        }
+      ]
+    },
+    "agent_type": "ToolSelector",
+    "index": {
+      "paper_directory": "literature/"
+    }
+  }
+}
