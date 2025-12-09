@@ -87,9 +87,6 @@
         }
       ]
     },
-    "agent_type": "ToolSelector",
-    "index": {
-      "paper_directory": "literature/"
-    }
+    "agent_type": "ToolSelector"
   }
 }
