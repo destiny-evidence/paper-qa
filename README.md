@@ -70,6 +70,33 @@ session = await docs.aquery(question, settings=helper.settings)
 print(session.answer)
 ```
 
+## To run the agent with a DESTINY repo search tool
+
+```python
+from dotenv import load_dotenv
+from paperqa import Settings, agent_query
+
+load_dotenv() # load your environment variables
+
+paper_directory = "~/some-directory"
+
+settings = Settings.from_name("search_only_destiny").model_copy(
+    update={
+        "paper_directory": paper_directory,
+        "verbosity": 0 # to reduce output
+    }
+)
+
+query = "What are the greatest health risks brought about by climate change?"
+
+answer_response = await agent_query(
+    query=query,
+    settings=settings
+)
+
+print(answer_response.session.answer) # show the agent's response
+```
+
 <!-- pyml disable-num-lines 6 line-length -->
 
 [![GitHub](https://img.shields.io/badge/GitHub-black?logo=github&logoColor=white)](https://github.com/Future-House/paper-qa)
