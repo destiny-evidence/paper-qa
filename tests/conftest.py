@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import os
 import shutil
+import tempfile
 from collections.abc import AsyncIterator, Coroutine, Iterator
 from importlib.metadata import version
 from pathlib import Path
@@ -165,23 +166,24 @@ def agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
     settings.answer.evidence_k = 10
     return settings
 
-@pytest.fixture
-def azure_agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Settings:
+@pytest.fixture(scope="function")
+def azure_agent_test_settings(agent_index_dir: Path, stub_data_dir: Path) -> Iterator[Settings]:
     # Lazily import from paperqa so typeguard doesn't throw:
     # > /path/to/.venv/lib/python3.12/site-packages/typeguard/_pytest_plugin.py:93:
     # > InstrumentationWarning: typeguard cannot check these packages because they
     # > are already imported: paperqa
     from paperqa.settings import Settings
 
-    # NOTE: originally here we had usage of embedding="sparse", but this was
-    # shown to be too crappy of an embedding to get past the Obama article
-    settings = Settings.from_name("azure")
-    settings.agent.index.paper_directory = stub_data_dir
-    settings.agent.index.index_directory = agent_index_dir
-    settings.agent.search_count = 10
-    settings.answer.answer_max_sources = 10
-    settings.answer.evidence_k = 10
-    return settings
+    with tempfile.TemporaryDirectory() as tempdir:
+        # NOTE: originally here we had usage of embedding="sparse", but this was
+        # shown to be too crappy of an embedding to get past the Obama article
+        settings = Settings.from_name("azure")
+        settings.agent.index.paper_directory = tempdir
+        settings.agent.index.index_directory = tempdir
+        settings.agent.search_count = 10
+        settings.answer.answer_max_sources = 10
+        settings.answer.evidence_k = 10
+        yield settings
 
 @pytest.fixture
 def agent_stub_session() -> PQASession:

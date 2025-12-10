@@ -3,11 +3,9 @@ import tempfile
 import pytest
 import pytest_asyncio
 
-from paperqa import Docs
 from paperqa.settings import Settings, IndexSettings
 from paperqa.sources.destiny_repo import get_access_token, get_relevant_references, DESTINYSearchPageIndexError, \
-    NoMoreDESTINYSearchResultsAvailable, NoDESTINYResultsFoundError, InvalidDESTINYQuerySyntaxError, \
-    MiscDESTINYSearchAPIError, add_destiny_references_to_docs
+    NoMoreDESTINYSearchResultsAvailable, NoDESTINYResultsFoundError, InvalidDESTINYQuerySyntaxError
 
 
 @pytest_asyncio.fixture(scope="function")

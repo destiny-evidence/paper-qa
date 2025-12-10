@@ -73,7 +73,8 @@ async def add_destiny_references_to_docs(
     try:
         access_token = get_access_token()
         references, total_result_count = await get_relevant_references(query, access_token, page, max_timeout)
-        await download_papers(references, settings.paper_directory, max_timeout)
+        paper_directory = settings.agent.index.paper_directory
+        await download_papers(references, paper_directory, max_timeout)
         assert references is not None, "references is None for some reason"
         references = {str(ref.id):ref for ref in references}
         await aadd_docs(references, docs, settings)
@@ -129,7 +130,8 @@ async def aadd_docs(
 ) -> None:
     # TODO we probably need to rethink this approach, currently we're looping through all downloaded files
     # and attempt to add their pdf to the Docs. But we're revisiting previously downloaded + added pdfs here
-    for doc_path in Path(settings.paper_directory).rglob("*.pdf"):
+    paper_directory = settings.agent.index.paper_directory
+    for doc_path in Path(paper_directory).rglob("*.pdf"):
         ref = references.get(doc_path.stem) if references is not None else None
         if ref:
             metadata = parse_metadata_from_reference(ref)
