@@ -57,6 +57,7 @@ def get_access_token():
     token = app.acquire_token_interactive(
         login_hint=LOGIN_HINT,
         scopes=SCOPES,
+        port=42071,  # Use fixed port for Docker compatibility
     )
     return token["access_token"]
 
