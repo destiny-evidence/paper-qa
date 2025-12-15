@@ -68,7 +68,7 @@ async def add_destiny_references_to_docs(
         page: int,
         max_timeout: float = 30.0
 ) -> tuple[int, int, str | None]:
-    initial_docs_size = len(docs.texts)
+    initial_docs_size = len(docs.docs)
     total_result_count = 0
     try:
         access_token = get_access_token()
@@ -78,9 +78,9 @@ async def add_destiny_references_to_docs(
         assert references is not None, "references is None for some reason"
         references = {str(ref.id):ref for ref in references}
         await aadd_docs(references, docs, settings)
-        return total_result_count, len(docs.texts) - initial_docs_size, None
+        return total_result_count, len(docs.docs) - initial_docs_size, None
     except Exception as e:
-        return total_result_count, len(docs.texts) - initial_docs_size, str(e)
+        return total_result_count, len(docs.docs) - initial_docs_size, str(e)
 
 async def download_papers(references: list[Reference], paper_directory: str | os.PathLike, max_timeout: float) -> None:
     """Download PDFs of all relevant papers found from the DESTINY repository search."""
@@ -135,14 +135,17 @@ async def aadd_docs(
         ref = references.get(doc_path.stem) if references is not None else None
         if ref:
             metadata = parse_metadata_from_reference(ref)
-            await docs.aadd(
-                doc_path,
-                settings=settings,
-                title=metadata.get("title", "Unknown"),
-                abstract=metadata.get("abstract", "Unknown"),
-                doi=metadata.get("doi", "Unknown"),
-                authors=metadata.get("authors", None)
-            )
+            try:
+                await docs.aadd(
+                    doc_path,
+                    settings=settings,
+                    title=metadata.get("title", "Unknown"),
+                    abstract=metadata.get("abstract", "Unknown"),
+                    doi=metadata.get("doi", "Unknown"),
+                    authors=metadata.get("authors", None)
+                )
+            except Exception as e:
+                logger.warning(f"Failed to add {doc_path} to docs: {e}")
 
 def parse_metadata_from_reference(ref: Reference) -> dict[str, Any]:
     metadata = {}

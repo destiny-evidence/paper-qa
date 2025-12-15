@@ -737,8 +737,8 @@ class DESTINYPaperSearch(NamedTool):
 
         if error_message is None:
             return (
-                f"Found a total of {total_result_count} reference papers on DESTINY's repository"
-                f" {new_result_count} of which were found and successfully added to the docs from page {page}." 
+                f"Search found a total of {total_result_count} reference papers on DESTINY's repository."
+                f" From page {page} of the search results, {new_result_count} were successfully added to the environment docs." 
                 f" {state.status}"
             )
 
