@@ -20,7 +20,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python",
@@ -28,11 +27,15 @@ classifiers = [
 ]
 dependencies = [
     "anyio",
+    "chainlit>=2.6.3",
+    "destiny-sdk>=0.6.0",
     "fhaviary[llm]>=0.27", # For partial tool concurrency
     "fhlmi>=0.41.0", # Pin for LiteLLMModel.get_router
     "html2text", # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "httpx-aiohttp",
+    "luqum>=1.0.0",
+    "msal>=1.34.0",
     "numpy",
     "paper-qa-pypdf", # TODO: after https://peps.python.org/pep-0771/, make this opt-out if 'pymupdf' extra is specified`
     "pyalex>=0.19",
@@ -56,7 +59,7 @@ maintainers = [
 ]
 name = "paper-qa"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [project.optional-dependencies]
 dev = [

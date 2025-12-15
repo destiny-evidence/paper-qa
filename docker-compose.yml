@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  chainlit-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+      - "42071:42071"  # MSAL authentication callback port
+    environment:
+      # Azure OpenAI
+      - AZURE_API_BASE=${AZURE_API_BASE}
+      - AZURE_API_KEY=${AZURE_API_KEY}
+
+      # DESTINY
+      - DESTINY_API_URL=${DESTINY_API_URL}
+      - DESTINY_CLIENT_ID=${DESTINY_CLIENT_ID}
+      - DESTINY_AUTHORITY=${DESTINY_AUTHORITY}
+      - DESTINY_LOGIN_HINT=${DESTINY_LOGIN_HINT}
+      - DESTINY_SCOPES=${DESTINY_SCOPES}
+    volumes:
+
+      # Persist Chainlit data
+      - chainlit-data:/app/.chainlit
+      - chainlit-files:/app/.files
+      - chainlit-public:/app/public
+
+    restart: unless-stopped
+
+volumes:
+  chainlit-data:
+  chainlit-files:
+  chainlit-public:

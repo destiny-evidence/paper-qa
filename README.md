@@ -1,5 +1,9 @@
 # PaperQA2
 
+## To run the project locally
+
+In line with the existing [CONTRIBUTING.md](CONTRIBUTING.md) file.  Executing `uv sync` in the project root is sufficient to start editing and running the project code locally.
+
 ## To run on our infrastructure
 
 There is a basic `azure.json` configuration file in `src/paperqa/configs` that provides a simple configuration `paperqa`'s `Settings` object.
@@ -14,6 +18,85 @@ For it to work, it requires a `.env` file in the project root directory populate
 - `OPENALEX_MAILTO`
 
 To make use of the configuration, simply create a `Settings` object using its `from_name` class method, passing the stem of the json config as a string, i.e. `Settings.from_name("azure")`.
+
+## To run the DESTINY repo paper helper
+
+The following additional environment variables are required:
+
+- `DESTINY_API_URL` (ATTOW https://destiny-repository-stag-app.proudmeadow-2a76e8ac.swedencentral.azurecontainerapps.io)
+- `DESTINY_CLIENT_ID` (ATTOW 96ed941e-15dc-4ec0-b9e7-e4eda99efd2e)
+- `DESTINY_AUTHORITY` (ATTOW https://login.microsoftonline.com/f870e5ae-5521-4a94-b9ff-cdde7d36dd35)
+- `DESTINY_SCOPES` (ATTOW api://14e3f6c0-b8aa-46c6-98d9-29b0dd2a0f7c/.default as a list, i.e. between double quotes ending with a comma) 
+- `DESTINY_LOGIN_HINT` (your UCL email address, see Lena's authentication notebook in the teams channel for more)
+
+See `test_contribs.py` for an example of running the paper helper.
+
+Using this forked version of paper-qa as a local package/dependency should work if not:
+
+```python
+import os
+from dotenv import load_dotenv
+from paperqa import Settings
+from paperqa.contrib.destiny_paper_helper import DESTINYPaperHelper
+from paperqa.settings import IndexSettings
+
+load_dotenv()
+
+paper_directory = "~/some-directory"
+
+settings = Settings.from_name("azure").model_copy(
+    update={
+        "paper_directory": paper_directory,
+        "index": IndexSettings(paper_directory=paper_directory)
+    }
+)
+helper = DESTINYPaperHelper(
+    settings,
+    api_url=os.getenv("DESTINY_API_URL"),
+    client_id=os.getenv("DESTINY_CLIENT_ID"),
+    authority=os.getenv("DESTINY_AUTHORITY"),
+    login_hint=os.getenv("DESTINY_LOGIN_HINT"),
+    scopes=os.getenv("DESTINY_SCOPES").split(","),
+)
+
+question = "What is the progress on climate change intervention research?"
+
+papers = await helper.fetch_relevant_papers(question)
+
+docs = await helper.aadd_docs(papers)
+
+session = await docs.aquery(question, settings=helper.settings)
+
+print(session.answer)
+```
+
+## To run the agent with a DESTINY repo search tool
+
+```python
+from dotenv import load_dotenv
+from paperqa import Settings, agent_query
+
+load_dotenv() # load your environment variables
+
+paper_directory = "~/some-directory"
+
+settings = Settings.from_name("search_only_destiny").model_copy(
+    update={
+        "paper_directory": paper_directory,
+        "verbosity": 0 # to reduce output
+    }
+)
+
+query = "What are the greatest health risks brought about by climate change?"
+
+answer_response = await agent_query(
+    query=query,
+    settings=settings
+)
+
+print(answer_response.session.answer) # show the agent's response
+```
+
 <!-- pyml disable-num-lines 6 line-length -->
 
 [![GitHub](https://img.shields.io/badge/GitHub-black?logo=github&logoColor=white)](https://github.com/Future-House/paper-qa)

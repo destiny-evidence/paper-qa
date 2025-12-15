@@ -55,7 +55,7 @@ from paperqa.agents.tools import (
     GenerateAnswer,
     PaperSearch,
     Reset,
-    make_status,
+    make_status, DESTINYPaperSearch,
 )
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
@@ -1048,6 +1048,31 @@ async def test_clinical_tool_usage(agent_test_settings) -> None:
         "ClinicalTrials.gov" in c.text.doc.citation for c in response.session.contexts
     ), "No clinical trials were put into contexts"
 
+@pytest.mark.asyncio
+async def test_DESTINY_tool_usage(azure_agent_test_settings) -> None:
+    azure_agent_test_settings.agent.tool_names = {
+        "destiny_search",
+        "gather_evidence",
+        "gen_answer",
+        "complete",
+    }
+
+    docs = Docs()
+    response = await run_agent(
+        docs,
+        query=(
+            "What are the best interventions to mitigate bad health outcomes"
+            " caused by climate change?"
+        ),
+        settings=azure_agent_test_settings,
+    )
+
+    # make sure tool was used at least once
+    assert any(
+        DESTINYPaperSearch.TOOL_FN_NAME in step
+        for step in response.session.tool_history
+    ), f"DESTINYPaperSearch was not used. Tool history: {response.session.tool_history}"
+    assert response.session.contexts, "No contexts from DESTINY papers"
 
 @pytest.mark.asyncio
 async def test_search_pagination(agent_test_settings: Settings) -> None:

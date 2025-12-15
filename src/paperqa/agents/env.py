@@ -36,7 +36,7 @@ from .tools import (
     GenerateAnswer,
     NamedTool,
     PaperSearch,
-    Reset,
+    Reset, DESTINYPaperSearch,
 )
 
 logger = logging.getLogger(__name__)
@@ -130,6 +130,12 @@ def settings_to_tools(  # noqa: PLR0912
                 ClinicalTrialsSearch(
                     search_count=settings.agent.search_count, settings=settings
                 ).clinical_trials_search
+            )
+        elif issubclass(tool_type, DESTINYPaperSearch):
+            tool = make_tool(
+                DESTINYPaperSearch(
+                    settings=settings
+                ).destiny_search
             )
         else:
             raise NotImplementedError(f"Didn't handle tool type {tool_type}.")

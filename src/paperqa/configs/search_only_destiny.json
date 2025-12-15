@@ -87,6 +87,17 @@
         }
       ]
     },
+    "tool_names": [
+      "destiny_search",
+      "gather_evidence",
+      "gen_answer",
+      "complete"
+    ],
     "agent_type": "ToolSelector"
+  },
+  "answer": {
+    "evidence_k": 15,
+    "answer_max_sources": 5,
+    "max_concurrent_requests": 10
   }
 }

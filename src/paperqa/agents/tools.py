@@ -20,6 +20,7 @@ from paperqa.sources.clinical_trials import add_clinical_trials_to_docs
 from paperqa.types import Context, DocDetails, PQASession
 
 from .search import get_directory_index
+from ..sources.destiny_repo import add_destiny_references_to_docs
 
 logger = logging.getLogger(__name__)
 
@@ -479,30 +480,30 @@ class ClinicalTrialsSearch(NamedTool):
                 Query Syntax:
                     Basic Search:
                         Simple text automatically uses default EXPANSION[Relaxation] and COVERAGE[Contains]
-                        >>> "heart attack"
+                        "heart attack"
 
                     Modified Search:
                         Use operators to modify search behavior:
-                        >>> 'EXPANSION[None]COVERAGE[FullMatch]"exact phrase"'
-                        >>> 'EXPANSION[Concept]heart attack'
+                        'EXPANSION[None]COVERAGE[FullMatch]"exact phrase"'
+                        'EXPANSION[Concept]heart attack'
 
                     Field Search:
                         Specify fields using AREA operator:
-                        >>> 'AREA[InterventionName]aspirin'
-                        >>> 'AREA[Phase]PHASE3'
+                        'AREA[InterventionName]aspirin'
+                        'AREA[Phase]PHASE3'
 
                     Location Search:
                         Use SEARCH operator for compound location queries:
-                        >>> 'cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)'
+                        'cancer AND SEARCH[Location](AREA[LocationCity]Boston AND AREA[LocationState]Massachusetts)'
 
                     Complex Boolean:
                         Combine terms with AND, OR, NOT and parentheses:
-                        >>> '(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)'
+                        '(cancer OR tumor) AND NOT (EXPANSION[None]pediatric OR AREA[StdAge]CHILD)'
 
                     Date Ranges:
                         Use RANGE to specify date ranges with formats like "yyyy-MM" or "yyyy-MM-dd".
                         Note that MIN and MAX can be used for open-ended ranges:
-                        >>> AREA[ResultsFirstPostDate]RANGE[2015-01-01, MAX]
+                        AREA[ResultsFirstPostDate]RANGE[2015-01-01, MAX]
 
                 Operators:
                     EXPANSION[type]: Controls term expansion
@@ -682,7 +683,67 @@ class ClinicalTrialsSearch(NamedTool):
                 f" {offset + new_result_count} among {total_result_count} total"
                 f" results. {state.status}"
             )
-        return f"Error in clinical trial query syntax: {error_message}"
+        return f"Error in DESTINY Search API: {error_message}"
+
+
+class DESTINYPaperSearch(NamedTool):
+    TOOL_FN_NAME = "destiny_search"
+
+    CONCURRENCY_SAFE = True
+
+    model_config = ConfigDict(extra="forbid")
+
+    previous_searches: dict[str, int] = Field(default_factory=dict)
+    settings: Settings = Field(default_factory=Settings)
+
+    async def destiny_search(
+            self,
+            query: str,
+            state: EnvironmentState
+    ) -> str:
+        """
+        Search the DESTINY repository for climate and health papers to increase the paper count.
+
+        Repeat previous calls with the same query to continue a search.
+        This tool can be called concurrently.
+        This tool introduces novel papers from DESTINY's curated repository, so invoke this tool when just beginning or when unsatisfied with the current evidence.
+
+        Args:
+            query: A Lucene search query string starting with ?q=. Basic format is ?q=keyword1 AND keyword2.
+                Examples:
+                - ?q=climate change AND health
+                - ?q=adaptation OR mitigation
+                - ?q=title:"climate change"&start_year=2015&end_year=2020
+            state: Current state.
+
+        Returns:
+            String describing searched papers and the current status.
+        """
+        try:
+            page = self.previous_searches[query]
+        except KeyError:
+            page = self.previous_searches[query] = 1
+
+        total_result_count, new_result_count, error_message = (
+            await add_destiny_references_to_docs(
+                query,
+                state.docs,
+                self.settings,
+                page=page
+            )
+        )
+
+        self.previous_searches[query] += 1
+
+        if error_message is None:
+            return (
+                f"Search found a total of {total_result_count} reference papers on DESTINY's repository."
+                f" From page {page} of the search results, {new_result_count} were successfully added to the environment docs." 
+                f" {state.status}"
+            )
+
+        return f"Searching the DESTINY repository failed: {error_message}"
+
 
 
 AVAILABLE_TOOL_NAME_TO_CLASS: dict[str, type[NamedTool]] = {
